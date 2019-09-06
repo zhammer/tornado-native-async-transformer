@@ -30,4 +30,4 @@ def test_unsupported_python_module(exception_case: ExceptionCase) -> None:
     with pytest.raises(TransformError) as exception:
         visited_tree = source_tree.visit(TornadoNativeAsyncTransformer())
 
-    assert exception_case.expected_error_message in str(exception)
+    assert exception_case.expected_error_message in str(exception.value)
