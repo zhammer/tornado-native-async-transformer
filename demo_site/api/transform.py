@@ -28,4 +28,3 @@ class handler(BaseHTTPRequestHandler):
         self.send_header("Content-type", "application/json")
         self.end_headers()
         self.wfile.write(json.dumps({"source": transformed}).encode())
-
