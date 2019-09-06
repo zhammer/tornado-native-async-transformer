@@ -3,6 +3,13 @@ from typing import List, Optional, Tuple, Union
 import libcst as cst
 
 
+class TransformError(Exception):
+    """
+    Error raised upon encountering a known error while attempting to transform
+    the tree.
+    """
+
+
 class TornadoNativeAsyncTransformer(cst.CSTTransformer):
     """
     A libcst transformer that replaces the legacy @gen.coroutine/yield
