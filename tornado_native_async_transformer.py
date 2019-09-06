@@ -28,6 +28,14 @@ class TornadoNativeAsyncTransformer(cst.CSTTransformer):
     def __init__(self):
         self.coroutine_stack: List[bool] = []
 
+    def visit_Call(self, node: cst.Call) -> Optional[bool]:
+        if self.is_gen_task_call(node):
+            raise TransformError(
+                "gen.Task (https://www.tornadoweb.org/en/branch2.4/gen.html#tornado.gen.Task) from tornado 2.4.1 is unsupported by this codemod. This file has not been modified. Manually update to supported syntax before running again."
+            )
+
+        return True
+
     def visit_FunctionDef(self, node: cst.FunctionDef) -> Optional[bool]:
         self.coroutine_stack.append(self.is_coroutine(node))
         # always continue to visit function
@@ -80,6 +88,17 @@ class TornadoNativeAsyncTransformer(cst.CSTTransformer):
             lpar=node.lpar,
             rpar=node.rpar,
         )
+
+    @staticmethod
+    def is_gen_task_call(node: cst.Call) -> bool:
+        if (
+            isinstance(node.func, cst.Attribute)
+            and node.func.value.value == "gen"
+            and node.func.attr.value == "Task"
+        ):
+            return True
+
+        return False
 
     @staticmethod
     def in_coroutine(coroutine_stack: List[bool]) -> bool:
