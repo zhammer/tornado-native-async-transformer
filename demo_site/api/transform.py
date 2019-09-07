@@ -1,6 +1,6 @@
 from http.server import BaseHTTPRequestHandler
-from tornado_native_async_transformer import (
-    TornadoNativeAsyncTransformer,
+from tornado_async_transformer import (
+    TornadoAsyncTransformer,
     TransformError,
 )
 import json
@@ -9,7 +9,7 @@ import libcst
 
 def transform(source: str) -> str:
     source_tree = libcst.parse_module(source)
-    visited_tree = source_tree.visit(TornadoNativeAsyncTransformer())
+    visited_tree = source_tree.visit(TornadoAsyncTransformer())
     return visited_tree.code
 
 
