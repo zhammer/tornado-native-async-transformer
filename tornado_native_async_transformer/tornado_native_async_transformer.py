@@ -51,7 +51,7 @@ class TornadoNativeAsyncTransformer(cst.CSTTransformer):
         if not self.in_coroutine(self.coroutine_stack):
             return updated_node
 
-        if self.is_gen_sleep_call(node):
+        if self.is_gen_sleep_call(updated_node):
             self.required_imports.add("asyncio")
             return updated_node.with_changes(
                 func=cst.Attribute(value=cst.Name("asyncio"), attr=cst.Name("sleep"))
@@ -74,7 +74,7 @@ class TornadoNativeAsyncTransformer(cst.CSTTransformer):
         return updated_node.with_changes(
             decorators=[
                 decorator
-                for decorator in node.decorators
+                for decorator in updated_node.decorators
                 if not self.is_coroutine_decorator(decorator)
             ],
             asynchronous=cst.Asynchronous(),
@@ -86,14 +86,14 @@ class TornadoNativeAsyncTransformer(cst.CSTTransformer):
         if not self.in_coroutine(self.coroutine_stack):
             return updated_node
 
-        if not self.is_gen_return(node):
+        if not self.is_gen_return(updated_node):
             return updated_node
 
-        return_value, whitespace_after = self.pluck_gen_return_value(node)
+        return_value, whitespace_after = self.pluck_gen_return_value(updated_node)
         return cst.Return(
             value=return_value,
             whitespace_after_return=whitespace_after,
-            semicolon=node.semicolon,
+            semicolon=updated_node.semicolon,
         )
 
     def leave_Yield(
@@ -108,7 +108,7 @@ class TornadoNativeAsyncTransformer(cst.CSTTransformer):
         if isinstance(updated_node.value, (cst.List, cst.ListComp)):
             self.required_imports.add("asyncio")
             expression = self.pluck_asyncio_gather_expression_from_yield_list_or_list_comp(
-                node
+                updated_node
             )
 
         elif isinstance(updated_node.value, (cst.Dict, cst.DictComp)):
