@@ -94,16 +94,12 @@ class TornadoNativeAsyncTransformer(cst.CSTTransformer):
         if not isinstance(node.value, cst.BaseExpression):
             return updated_node
 
-        if isinstance(node.value, cst.List):
+        if isinstance(node.value, (cst.List, cst.ListComp)):
             self.required_imports.add("asyncio")
             expression = self.pluck_asyncio_gather_expression_from_yield_list_or_list_comp(
                 node
             )
 
-        elif isinstance(node.value, cst.ListComp):
-            self.required_imports.add("asyncio")
-            expression = self.pluck_asyncio_gather_expression_from_yield_list_or_list_comp(
-                node
             )
 
         else:
