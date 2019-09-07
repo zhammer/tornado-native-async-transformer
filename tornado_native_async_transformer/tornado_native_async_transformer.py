@@ -47,6 +47,18 @@ class TornadoNativeAsyncTransformer(cst.CSTTransformer):
 
         return True
 
+    def leave_Call(self, node: cst.Call, updated_node: cst.Call) -> cst.Call:
+        if not self.in_coroutine(self.coroutine_stack):
+            return updated_node
+
+        if self.is_gen_sleep_call(node):
+            self.required_imports.add("asyncio")
+            return updated_node.with_changes(
+                func=cst.Attribute(value=cst.Name("asyncio"), attr=cst.Name("sleep"))
+            )
+
+        return updated_node
+
     def visit_FunctionDef(self, node: cst.FunctionDef) -> Optional[bool]:
         self.coroutine_stack.append(self.is_coroutine(node))
         # always continue to visit function
@@ -123,6 +135,18 @@ class TornadoNativeAsyncTransformer(cst.CSTTransformer):
             lpar=node.lpar,
             rpar=node.rpar,
         )
+
+    @staticmethod
+    def is_gen_sleep_call(node: cst.Call) -> bool:
+        if (
+            isinstance(node.func, cst.Attribute)
+            and isinstance(node.func.value, cst.Name)
+            and node.func.value.value == "gen"
+            and node.func.attr.value == "sleep"
+        ):
+            return True
+
+        return False
 
     @staticmethod
     def pluck_asyncio_gather_expression_from_yield_list_or_list_comp(
