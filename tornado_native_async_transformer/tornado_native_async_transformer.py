@@ -22,7 +22,6 @@ class TornadoNativeAsyncTransformer(cst.CSTTransformer):
     """
 
     # TODO: @tornado.gen.coroutine, @tornado.gen.Return
-    # TODO: yield dict
     # TODO: gen.sleep
 
     def __init__(self):
