@@ -4,14 +4,19 @@ A [libcst](https://github.com/Instagram/LibCST) transformer for updating tornado
 
 [Check out the demo.](https://tornado-async-transformer.zhammer.now.sh/)
 
+### Usage
+You can either:
+- Add `tornado_async_transformer.TornadoAsyncTransformer` to your existing libcst codemod.
+- Or run `python -m tornado_async_transformer.tool my_project/` from the commandline.
+
 #### Example
 ```diff
  """
  A simple coroutine.
  """
  from tornado import gen
- 
- 
+
+
 -@gen.coroutine
 -def call_api():
 -    response = yield fetch()
