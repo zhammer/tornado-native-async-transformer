@@ -102,38 +102,38 @@ class TornadoNativeAsyncTransformer(cst.CSTTransformer):
         if not self.in_coroutine(self.coroutine_stack):
             return updated_node
 
-        if not isinstance(node.value, cst.BaseExpression):
+        if not isinstance(updated_node.value, cst.BaseExpression):
             return updated_node
 
-        if isinstance(node.value, (cst.List, cst.ListComp)):
+        if isinstance(updated_node.value, (cst.List, cst.ListComp)):
             self.required_imports.add("asyncio")
             expression = self.pluck_asyncio_gather_expression_from_yield_list_or_list_comp(
                 node
             )
 
-        elif isinstance(node.value, (cst.Dict, cst.DictComp)):
+        elif isinstance(updated_node.value, (cst.Dict, cst.DictComp)):
             raise TransformError(
                 "Yielding a dict of futures (https://www.tornadoweb.org/en/branch3.2/releases/v3.2.0.html#tornado-gen) added in tornado 3.2 is unsupported by the codemod. This file has not been modified. Manually update to supported syntax before running again."
             )
 
-        elif isinstance(node.value, cst.Call):
+        elif isinstance(updated_node.value, cst.Call):
             if (
-                isinstance(node.value.func, cst.Name)
-                and node.value.func.value == "dict"
+                isinstance(updated_node.value.func, cst.Name)
+                and updated_node.value.func.value == "dict"
             ):
                 raise TransformError(
                     "Yielding a dict of futures (https://www.tornadoweb.org/en/branch3.2/releases/v3.2.0.html#tornado-gen) added in tornado 3.2 is unsupported by the codemod. This file has not been modified. Manually update to supported syntax before running again."
                 )
-            expression = node.value
+            expression = updated_node.value
 
         else:
-            expression = node.value
+            expression = updated_node.value
 
         return cst.Await(
             expression=expression,
-            whitespace_after_await=node.whitespace_after_yield,
-            lpar=node.lpar,
-            rpar=node.rpar,
+            whitespace_after_await=updated_node.whitespace_after_yield,
+            lpar=updated_node.lpar,
+            rpar=updated_node.rpar,
         )
 
     @staticmethod
