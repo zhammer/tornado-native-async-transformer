@@ -218,6 +218,10 @@ class TornadoAsyncTransformer(cst.CSTTransformer):
 
     @staticmethod
     def is_coroutine(function_def: cst.FunctionDef) -> bool:
+        # function already uses async def
+        if not function_def.asynchronous is None:
+            return False
+
         return any(
             (
                 TornadoAsyncTransformer.is_coroutine_decorator(
