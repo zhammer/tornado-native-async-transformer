@@ -17,7 +17,7 @@ jobs:
     - uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python-version }}
-    - run: sudo pip3 install -r requirements.txt
+    - run: pip3 install --user -r requirements.txt
     - run: pytest -vv
 
   lint:
@@ -29,7 +29,7 @@ jobs:
     - uses: actions/setup-python@v1
       with:
         python-version: '3.7'
-    - run: sudo pip3 install -r requirements.txt
+    - run: pip3 install --user -r requirements.txt
     - run: black --check .
     - run: mypy tornado_async_transformer
 
@@ -45,7 +45,7 @@ jobs:
     - uses: actions/setup-python@v1
       with:
         python-version: '3.7'
-    - run: sudo pip3 install -r requirements.txt
+    - run: pip3 install --user -r requirements.txt
     - name: Deploy to pypi
       if: github.ref == 'refs/heads/master'
       env:
