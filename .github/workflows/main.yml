@@ -17,12 +17,8 @@ jobs:
     - uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install pipenv
-      run: sudo pip install pipenv
-    - name: Setup pipenv
-      run: pipenv sync --dev
-    - name: Run test suite
-      run: pipenv run pytest -vv
+      run: sudo pip3 install -r requirements.txt
+      run: pytest -vv
 
   lint:
 
@@ -33,21 +29,9 @@ jobs:
     - uses: actions/setup-python@v1
       with:
         python-version: '3.7'
-    - name: Install pipenv
-      run: sudo pip install pipenv
-    - name: Setup pipenv
-      run: pipenv sync --dev
-    - name: Check black formatting
-      run: pipenv run black --check .
-    - name: Mypy
-      run: pipenv run mypy tornado_async_transformer
-    - name: Deploy to pypi
-      if: github.ref == 'refs/heads/master'
-      env:
-        TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
-      run: pipenv run bundle && pipenv run deploy
-
+    - run: sudo pip3 install -r requirements.txt
+    - run: black --check .
+    - run: mypy tornado_async_transformer
 
   deploy:
 
@@ -61,13 +45,12 @@ jobs:
     - uses: actions/setup-python@v1
       with:
         python-version: '3.7'
-    - name: Install pipenv
-      run: sudo pip install pipenv
-    - name: Setup pipenv
-      run: pipenv sync --dev
+    - run: sudo pip3 install -r requirements.txt
     - name: Deploy to pypi
       if: github.ref == 'refs/heads/master'
       env:
         TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
-      run: pipenv run bundle && pipenv run deploy
+      run: |
+        python setup.py sdist bdist_wheel
+        twine upload --skip-existing dist/*
