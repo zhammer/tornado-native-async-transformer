@@ -29,7 +29,7 @@ class TornadoAsyncTransformer(cst.CSTTransformer):
         self.coroutine_stack: List[bool] = []
         self.required_imports: Set[str] = set()
 
-    def leave_Module(self, original_node: cst.Module, updated_node: cst.Module) -> cst.Module:
+    def leave_Module(self, node: cst.Module, updated_node: cst.Module) -> cst.Module:
         if not self.required_imports:
             return updated_node
 
