@@ -17,8 +17,8 @@ jobs:
     - uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python-version }}
-      run: sudo pip3 install -r requirements.txt
-      run: pytest -vv
+    - run: sudo pip3 install -r requirements.txt
+    - run: pytest -vv
 
   lint:
 
