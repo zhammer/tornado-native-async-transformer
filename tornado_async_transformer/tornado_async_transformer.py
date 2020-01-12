@@ -150,6 +150,10 @@ class TornadoAsyncTransformer(cst.CSTTransformer):
         else:
             expression = updated_node.value
 
+        assert isinstance(
+            updated_node.whitespace_after_yield, cst.BaseParenthesizableWhitespace
+        )
+
         return cst.Await(
             expression=expression,
             whitespace_after_await=updated_node.whitespace_after_yield,
@@ -161,6 +165,7 @@ class TornadoAsyncTransformer(cst.CSTTransformer):
     def pluck_asyncio_gather_expression_from_yield_list_or_list_comp(
         node: cst.Yield,
     ) -> cst.BaseExpression:
+        assert isinstance(node.value, cst.BaseExpression)
         return cst.Call(
             func=cst.Attribute(value=cst.Name("asyncio"), attr=cst.Name("gather")),
             args=[cst.Arg(value=node.value, star="*")],
